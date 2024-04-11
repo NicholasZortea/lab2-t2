@@ -37,4 +37,6 @@ void fila_inicia_percurso(Fila self, int pos_inicial);
 // retorna true caso positivo, false caso o percurso tenha terminado
 bool fila_proximo(Fila self, void *pdado);
 
+void printa_fila_int(Fila fila);
+
 #endif //_FILA_H_
