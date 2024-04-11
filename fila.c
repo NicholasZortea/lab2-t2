@@ -4,12 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_ELEM 1000
+#define MIN_MALLOC 10
 
 struct _fila {
+  int primeiro;
+  int ultimo;
   int n_elem;
   int tam_dado;
   int pos_percurso;
+  int cap;
   void *espaco;
 };
 
@@ -19,9 +22,12 @@ struct _fila {
 Fila fila_cria(int tam_do_dado) {
   Fila self = malloc(sizeof(struct _fila));
   if (self != NULL) {
-    self->espaco = malloc(MAX_ELEM * tam_do_dado);
+    self->espaco = malloc(MIN_MALLOC * tam_do_dado);
     if (self->espaco != NULL) {
+      self->primeiro = 0;
+      self->ultimo = 0;
       self->n_elem = 0;
+      self->cap = 10;
       self->tam_dado = tam_do_dado;
     } else {
       free(self);
@@ -50,6 +56,7 @@ static void *calcula_ponteiro(Fila self, int pos)
 
 bool fila_vazia(Fila self) { return self->n_elem == 0; }
 
+//remove da primeira posição
 void fila_remove(Fila self, void *pdado) {
   void *ptr = calcula_ponteiro(self, 0);
   assert(ptr != NULL);
@@ -67,13 +74,17 @@ void fila_remove(Fila self, void *pdado) {
   self->n_elem--;
 }
 
-void fila_insere(Fila self, void *pdado) {
-  assert(self->n_elem < MAX_ELEM);
-  self->n_elem++;
-  void *ptr = calcula_ponteiro(self, self->n_elem - 1);
-  memmove(ptr, pdado, self->tam_dado);
+//insere no final
+void fila_insere(Fila self, void *pdado)
+{
+  if (self->n_elem < self->cap)
+  {
+    if(self->n_elem != 0) self->ultimo++;
+    self->n_elem++;
+    void *ptr = calcula_ponteiro(self, self->ultimo);
+    memmove(ptr, pdado, self->tam_dado);
+  }
 }
-
 
 void fila_inicia_percurso(Fila self, int pos_inicial)
 {
@@ -91,4 +102,18 @@ bool fila_proximo(Fila self, void *pdado)
     self->pos_percurso++;
   }
   return true;
+}
+
+void printa_fila_int(Fila fila){
+  for(int i = 0; i < fila->n_elem; i++){
+    int pos;
+    if(fila->primeiro+i > fila->cap-1){
+      pos = fila->primeiro+i - fila->cap;
+    } else {
+      pos = fila->primeiro + i;
+    }
+    int* val = (int*)calcula_ponteiro(fila, pos);
+    printf("Valor: %d\n", *(val));
+
+  }
 }
