@@ -17,7 +17,8 @@ struct _fila
   void *espaco;
 };
 
-int fila_tamanho(Fila self){
+int fila_tamanho(Fila self)
+{
   return self->n_elem;
 }
 
@@ -37,7 +38,7 @@ Fila fila_cria(int tam_do_dado)
       self->primeiro = 0;
       self->ultimo = 0;
       self->n_elem = 0;
-      self->cap = 10;
+      self->cap = 5;
       self->tam_dado = tam_do_dado;
     }
     else
@@ -60,30 +61,52 @@ static void *calcula_ponteiro(Fila self, int pos, bool converte)
 {
   // TODO: suporte a pos negativa
   // printf("pos: %d, self->n_elem: %d \n", pos, self->n_elem);
-  
-  if(self->n_elem==0) return NULL;
+
+  if (self->n_elem == 0)
+    return NULL;
   if (pos < 0)
   {
     pos = self->n_elem + pos;
-    
   }
 
-  if(converte){
-    pos+=self->primeiro;
-    if(pos>=self->cap){
+  if (converte)
+  {
+    if (pos >= self->cap)
+      return NULL;
+    pos += self->primeiro;
+    if (pos >= self->cap)
+    {
       pos = pos - self->cap;
     }
   }
 
-  if(self->primeiro==0 && self->ultimo<pos) return NULL;
-  
-  if (pos < self->primeiro && pos > self->ultimo) return NULL;
-  if(self->primeiro == self->ultimo && pos > self->ultimo) return NULL;
+  if (!ehUmaPosValida(self, pos))
+    return NULL;
+
   // calcula a posição convertendo para char *, porque dá para somar em
   //   bytes. tem que fazer essa conversão porque não conhecemos o tipo
   //   do dado do usuário, só o tamanho.
   void *ptr = (char *)self->espaco + pos * self->tam_dado;
   return ptr;
+}
+
+bool ehUmaPosValida(Fila f, int p)
+{
+  if (f->primeiro == 0 && f->ultimo < p)
+    return false;
+
+  if (p < f->primeiro && p > f->ultimo)
+    return false;
+  if (f->primeiro == f->ultimo && p > f->ultimo)
+    return false;
+
+  if ((f->primeiro <= f->ultimo && (p < f->primeiro || p > f->ultimo)) ||
+      (f->ultimo < f->primeiro && (p < f->primeiro && p > f->ultimo)))
+  {
+    return false;
+  }
+
+  return true;
 }
 
 bool fila_vazia(Fila self) { return self->n_elem == 0; }
@@ -117,7 +140,7 @@ void fila_insere(Fila self, void *pdado)
     {
       self->ultimo = self->cap - self->ultimo;
     }
-    void *ptr = calcula_ponteiro(self, self->ultimo,false);
+    void *ptr = calcula_ponteiro(self, self->ultimo, false);
     memmove(ptr, pdado, self->tam_dado);
   }
   else
@@ -130,20 +153,23 @@ void fila_insere(Fila self, void *pdado)
 void alocaMaisEspaco(Fila self)
 {
   self->espaco = (void *)realloc(self->espaco, (self->tam_dado * (self->cap + MIN_MALLOC)));
+
   if (self->primeiro != 0) // nenhum elemento foi removido e
   {
-    int novoPrimeiro = self->primeiro + 10;
+    int novoPrimeiro = self->primeiro + MIN_MALLOC;
     int qntsMover = self->cap - self->primeiro;
-    self->cap += 10;
+
     int oldPrimeiro = self->primeiro;
     for (int i = 0; i < qntsMover; i++)
     {
-      void *dado_a_mover = calcula_ponteiro(self, oldPrimeiro + i,false);
+      void *dado_a_mover = calcula_ponteiro(self, oldPrimeiro + i, false);
       void *endereco_destino = calcula_ponteiro(self, novoPrimeiro + i, false);
       memmove(endereco_destino, dado_a_mover, self->tam_dado);
     }
     self->primeiro = novoPrimeiro;
   }
+
+  self->cap += MIN_MALLOC;
 }
 
 void fila_inicia_percurso(Fila self, int pos_inicial)
@@ -153,7 +179,7 @@ void fila_inicia_percurso(Fila self, int pos_inicial)
 
 bool fila_proximo(Fila self, void *pdado)
 {
-  //printf("fila_proximo!\n");
+  // printf("fila_proximo!\n");
   void *ptr = calcula_ponteiro(self, self->pos_percurso, true);
   if (ptr == NULL)
     return false;

@@ -41,5 +41,7 @@ void printa_fila_int(Fila fila);
 
 void alocaMaisEspaco(Fila self);
 
+bool ehUmaPosValida(Fila self, int pos);
+
 int fila_tamanho(Fila self);
 #endif //_FILA_H_
