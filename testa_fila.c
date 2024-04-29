@@ -89,9 +89,26 @@ void teste_insere_cem(){
     int x = 2;
     for(int i = 0; i < 100; i++){
         fila_insere(fila, &x);
-        printf("i: %d\n", i);
     }
     fila_destroi(fila);
+}
+
+void teste_remove_otimizado(){
+    Fila f = fila_cria(sizeof(int));
+    for(int i = 0; i < 10; i++){
+        fila_insere(f, &i);
+    }
+    printf("Tamanho cap: %d", fila_cap(f));
+    for(int i = 0; i < 10; i++){
+        fila_insere(f, &i);
+    }
+    printf("Tamanho cap: %d", fila_cap(f));
+    for(int i = 0; i < 15; i++){
+        fila_remove(f, NULL);
+    }
+    printf("Tamanho cap: %d", fila_cap(f));
+    printa_fila_int(f);
+    fila_destroi(f);
 }
 
 int main()
@@ -100,5 +117,5 @@ int main()
     teste_insere_cem();
     testa_percurso();
     testa_percurso2();
-    // printa_fila_int(filax);
+    teste_remove_otimizado();
 }

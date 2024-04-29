@@ -39,9 +39,13 @@ bool fila_proximo(Fila self, void *pdado);
 
 void printa_fila_int(Fila fila);
 
-void alocaMaisEspaco(Fila self);
+void aloca_mais_espaco(Fila self);
 
-bool ehUmaPosValida(Fila self, int pos);
+bool pos_valida(Fila self, int pos);
+
+void desaloca_mem_extra(Fila f);
 
 int fila_tamanho(Fila self);
+
+int fila_cap(Fila f);
 #endif //_FILA_H_

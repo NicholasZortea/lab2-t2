@@ -22,23 +22,24 @@ int fila_tamanho(Fila self)
   return self->n_elem;
 }
 
+int fila_cap(Fila f){
+  return f->cap;
+}
 // funções que implementam as operações básicas de uma fila
 
 // cria uma fila vazia que suporta dados do tamanho fornecido (em bytes)
 Fila fila_cria(int tam_do_dado)
 {
-  printf("Criando a fila!");
   Fila self = malloc(sizeof(struct _fila));
   if (self != NULL)
   {
-    printf("Tamanho do dado: %d Tamanho do MIN_Malloc: %d\n", tam_do_dado, MIN_MALLOC);
     self->espaco = malloc(MIN_MALLOC * tam_do_dado);
     if (self->espaco != NULL)
     {
       self->primeiro = 0;
       self->ultimo = 0;
       self->n_elem = 0;
-      self->cap = 5;
+      self->cap = 10;
       self->tam_dado = tam_do_dado;
     }
     else
@@ -80,7 +81,7 @@ static void *calcula_ponteiro(Fila self, int pos, bool converte)
     }
   }
 
-  if (!ehUmaPosValida(self, pos))
+  if (!pos_valida(self, pos))
     return NULL;
 
   // calcula a posição convertendo para char *, porque dá para somar em
@@ -90,7 +91,7 @@ static void *calcula_ponteiro(Fila self, int pos, bool converte)
   return ptr;
 }
 
-bool ehUmaPosValida(Fila f, int p)
+bool pos_valida(Fila f, int p)
 {
   if (f->primeiro == 0 && f->ultimo < p)
     return false;
@@ -126,6 +127,34 @@ void fila_remove(Fila self, void *pdado)
     self->primeiro = self->cap - self->primeiro;
   }
   self->n_elem--;
+  if(self->cap > MIN_MALLOC && self->n_elem < self->cap/3){
+    desaloca_mem_extra(self);
+  }
+}
+
+void desaloca_mem_extra(Fila f){
+  if(f->primeiro > f->ultimo){
+    int novoP = f->ultimo+1;
+    int qntsMover = f->cap-f->primeiro;
+    for(int i = 0; i < qntsMover; i++){
+      void *d = calcula_ponteiro(f, f->primeiro+i, false);
+      void *destino = calcula_ponteiro(f, novoP+i, false);
+      memmove(destino, d, f->tam_dado);
+    }
+    f->primeiro = novoP;
+  } else if(f->ultimo > f->primeiro) {
+    int novoP = f->cap / 2 - (f->primeiro - f->n_elem);
+    int novoU = (f->ultimo - f->n_elem) - f->cap / 2;
+    for(int i = 0; i < f->n_elem; i++){
+      void *d = calcula_ponteiro(f, f->primeiro+i, false);
+      void *destino = (char *)f->espaco + (novoP + i) * f->tam_dado;
+      memmove(destino, d, f->tam_dado);
+    }
+    f->primeiro = novoP;
+    f->ultimo = novoU;
+  }
+  f->espaco = (Fila)realloc(f->espaco, f->cap/2 * sizeof(f->tam_dado));
+  f->cap = f->cap/2;
 }
 
 // insere no final
@@ -145,12 +174,12 @@ void fila_insere(Fila self, void *pdado)
   }
   else
   {
-    alocaMaisEspaco(self);
+    aloca_mais_espaco(self);
     fila_insere(self, pdado);
   }
 }
 
-void alocaMaisEspaco(Fila self)
+void aloca_mais_espaco(Fila self)
 {
   self->espaco = (void *)realloc(self->espaco, (self->tam_dado * (self->cap + MIN_MALLOC)));
 
