@@ -22,8 +22,6 @@ typedef struct {
   int col;
 } posicao;
 
-int count = 0;
-
 // tamanho de algo na tela
 typedef struct {
   int nlin;
@@ -238,7 +236,6 @@ void inicializa_jogo(estado *j) {
   j->obstaculos = fila_cria(sizeof(obstaculo));
   sorteia_obstaculos(j);
   sorteia_premio(j);
-
   j->pontos = 0;
   j->estado = normal;
 }
@@ -265,6 +262,7 @@ void desenha_tela(estado *j) {
   desenha_cobra(j->aninha.corpo);
   desenha_obstaculos(j->obstaculos);
   desenha_premio(j->premio);
+
   // faz aparecer na tela o que foi desenhado
   tela_atualiza();
 }
@@ -288,7 +286,6 @@ void processa_teclado(estado *j) {
 }
 
 void movimenta(estado *j) {
-
   if (j->estado == terminando) {
     fila_remove(j->aninha.corpo, NULL);
     if (fila_vazia(j->aninha.corpo)) {
@@ -301,7 +298,6 @@ void movimenta(estado *j) {
   pos = avanca_pos(pos, j->aninha.dir);
   // vê se bateu em algo
   // TODO: ver se saiu da tela
-
   if (obstaculos_contem(j->obstaculos, pos) ||
       cobra_contem(j->aninha.corpo, pos)) {
     j->estado = terminando;
@@ -322,9 +318,7 @@ void movimenta(estado *j) {
     j->aumentando--;
     j->pontos += 9;
   }
-
 }
-
 
 // A função principal
 int main(void) {
@@ -332,14 +326,9 @@ int main(void) {
   inicializa_jogo(&jogo);
 
   while (jogo.estado != terminado) {
-    printf("i: %d\n", count);
-    printf("desenhaTela!\n");
     desenha_tela(&jogo);
-    printf("processa_teclado!\n");
     processa_teclado(&jogo);
-    printf("movimenta!\n");
     movimenta(&jogo);
-    count++;
   }
 
   finaliza_jogo(&jogo);
