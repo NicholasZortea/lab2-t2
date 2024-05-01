@@ -3,7 +3,6 @@
 #include <stdbool.h>
 
 typedef struct _fila *Fila;
-
 // funções que implementam as operações básicas de uma fila
 
 // cria uma fila vazia que suporta dados do tamanho fornecido (em bytes)
@@ -38,5 +37,7 @@ void fila_inicia_percurso(Fila self, int pos_inicial);
 // senão, coloca o próximo dado do percurso em *pdado (se pdado não for NULL),
 //   avança o percurso para o dado seguinte e retorna true
 bool fila_proximo(Fila self, void *pdado);
+
+void fila_imprime(Fila f, void(*cb)(void*));
 
 #endif //_FILA_H_

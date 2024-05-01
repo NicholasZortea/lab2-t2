@@ -224,8 +224,9 @@ void sorteia_premio(estado *j) {
 
 void inicializa_jogo(estado *j) {
   // inicializa a tela gráfica
-  tela_ini();
+  //tela_ini();
   tecla_ini();
+  printf("Inicializando o jogo!\n");
 
   j->tela = (retangulo){{2, 1}, {tela_nlin() - 1, tela_ncol()}};
   j->aninha.corpo = fila_cria(sizeof(posicao));
@@ -241,6 +242,7 @@ void inicializa_jogo(estado *j) {
 }
 
 void finaliza_jogo(estado *j) {
+  printf("Finalizaando o jogo!\n");
   tela_fim();
   tecla_fim();
 
@@ -270,16 +272,16 @@ void desenha_tela(estado *j) {
 void processa_teclado(estado *j) {
   char c = tecla_le_char();
   switch (c) {
-  case 'u':
+  case 'w':
     j->aninha.dir = cima;
     break;
-  case 'n':
+  case 'a':
     j->aninha.dir = esquerda;
     break;
-  case 'e':
+  case 's':
     j->aninha.dir = baixo;
     break;
-  case 'i':
+  case 'd':
     j->aninha.dir = direita;
     break;
   }
@@ -326,10 +328,11 @@ int main(void) {
   inicializa_jogo(&jogo);
 
   while (jogo.estado != terminado) {
-    desenha_tela(&jogo);
+    //desenha_tela(&jogo);
     processa_teclado(&jogo);
     movimenta(&jogo);
   }
+
 
   finaliza_jogo(&jogo);
 
