@@ -40,4 +40,6 @@ bool fila_proximo(Fila self, void *pdado);
 
 void fila_imprime(Fila f, void(*cb)(void*));
 
+int qntd(Fila self);
+
 #endif //_FILA_H_

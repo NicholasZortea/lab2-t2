@@ -9,7 +9,7 @@
 static void imprime_int(void *dado) // imprime inteiros
 {
     int *i = (int *)dado;
-    printf("%d\n", *i);
+    //printf("%d\n", *i);
 }
 
 void insere(Fila f, int v[], int qntd)
@@ -34,11 +34,11 @@ void test_fila_percurso()
 {
     printf("Teste fila percurso: \n\n");
     Fila f = fila_cria(4);
-    int v[] = {5, 4, 3, 2, 1};
-    insere(f, v, 5);
-    fila_inicia_percurso(f,5);
+    int v[] = {5,2};
+    insere(f, v, 2);
+    fila_inicia_percurso(f, 1);
     int valor;
-    while(fila_proximo(f, &valor))
+    while (fila_proximo(f, &valor, imprime_int))
     {
         printf("Valor: %d\n", valor);
     }

@@ -18,6 +18,7 @@ struct _fila
   nodo *primeiro;
   nodo *ultimo;
   nodo *percurso;
+  int qtd;
 };
 
 nodo *aloca_nodo(Fila f, void *pdado);
@@ -36,6 +37,7 @@ Fila fila_cria(int tam_do_dado)
   f->primeiro = NULL;
   f->ultimo = NULL;
   f->percurso = NULL;
+  f->qtd = 0;
   return f;
 }
 
@@ -47,6 +49,7 @@ void fila_destroi(Fila self)
     while (atual != NULL) // enquanto for diferente de NULL continua liberando
     {
       nodo *prox = atual->prox;
+      free(atual->dado);
       free(atual);
       atual = prox;
     }
@@ -82,6 +85,10 @@ bool fila_vazia(Fila self)
   return self->primeiro == NULL;
 }
 
+int qntd(Fila self) 
+{
+  return self->qtd;
+}
 // remove do inicio
 void fila_remove(Fila self, void *pdado)
 {
@@ -96,6 +103,7 @@ void fila_remove(Fila self, void *pdado)
     nodo *prox = primeiro->prox;
     free(primeiro);
     self->primeiro = prox;
+    self->qtd--;
   } else {
     printf("Fila vazia nao eh possivel remover!\n");
   }
@@ -105,11 +113,10 @@ void fila_remove(Fila self, void *pdado)
 void fila_insere(Fila self, void *pdado)
 {
   nodo *novo_nodo = aloca_nodo(self, pdado);
-
+  novo_nodo->prox = NULL;
   if (fila_vazia(self))
   { // se for o primeiro dado, deve ser o ultimo e o primeiro da fila
     self->primeiro = novo_nodo;
-    novo_nodo->prox = NULL;
     self->ultimo = novo_nodo;
   }
   else
@@ -117,6 +124,7 @@ void fila_insere(Fila self, void *pdado)
     self->ultimo->prox = novo_nodo;
     self->ultimo = novo_nodo;
   }
+  self->qtd++;
 }
 
 nodo *aloca_nodo(Fila f, void *pdado)
@@ -128,7 +136,13 @@ nodo *aloca_nodo(Fila f, void *pdado)
     exit(1);
   }
   novo_nodo->prox = NULL;
-  novo_nodo->dado = pdado;
+  novo_nodo->dado = (void*)malloc(f->tam_dado);
+  if(novo_nodo->dado == NULL)
+  {
+    printf("Erro ao alocar espaco do dado!\n");
+    exit(1);
+  }
+  memcpy(novo_nodo->dado, pdado, f->tam_dado);
   return novo_nodo;
 }
 
@@ -163,7 +177,7 @@ void fila_inicia_percurso(Fila self, int pos_inicial)
 
 bool fila_proximo(Fila self, void *pdado)
 {
-  if (self->percurso==NULL)
+  if (self->percurso==NULL || fila_vazia(self)) 
     return false;
   // copia o dado para o ponteiro do usuário
   if (pdado != NULL)
